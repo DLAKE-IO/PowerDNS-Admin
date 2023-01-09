@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
   {% block title %}<title>{{ SITE_NAME }}</title>{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
   <!--  Get Google Fonts we like -->
   {% if OFFLINE_MODE %}
   <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/source_sans_pro.css') }}">
@@ -21,6 +22,9 @@
   {% assets "css_main" -%}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
   {%- endassets %}
+{% if SETTING.get('custom_css') %}
+  <link rel="stylesheet" href="/static/custom/{{ SETTING.get('custom_css') }}">
+{% endif %}
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -114,6 +118,11 @@
           <a href="{{ url_for('domain.add') }}"><i class="fa fa-plus"></i> <span>New Domain</span></a>
         </li>
         {% endif %}
+        {% if SETTING.get('allow_user_remove_domain') or current_user.role.name in ['Administrator', 'Operator'] %}
+        <li class="{{ 'active' if active_page == 'remove_domain' else '' }}">
+          <a href="{{ url_for('domain.remove') }}"><i class="fa fa-trash-o"></i> <span>Remove Domain</span></a>
+        </li>
+        {% endif %}
         {% if current_user.role.name in ['Administrator', 'Operator'] %}
         <li class="header">ADMINISTRATION</li>
         <li class="{{ 'active' if active_page == 'admin_console' else '' }}">
@@ -185,7 +194,7 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong><a href="https://github.com/ngoduykhanh/PowerDNS-Admin">PowerDNS-Admin</a></strong> - A PowerDNS web interface with advanced features.
+    <strong><a href="https://github.com/PowerDNS-Admin/PowerDNS-Admin">PowerDNS-Admin</a></strong> - A PowerDNS web interface with advanced features.
   </footer>
 </div>
 <!-- ./wrapper -->
@@ -289,6 +298,18 @@
         }
       });
     });
+
+    function showErrorModal(message) {
+      var modal = $('#modal_error');
+      modal.find('.modal-body p').text(message);
+      modal.modal('show');
+    }
+
+    function showSuccessModal(message) {
+      var modal = $("#modal_success");
+      modal.find('.modal-body p').text(message);
+      modal.modal('show');
+    }
   </script>
   {% endif %}
 {%- endassets %}

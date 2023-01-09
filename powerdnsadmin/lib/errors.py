@@ -44,6 +44,13 @@ class DomainAccessForbidden(StructuredException):
         self.message = message
         self.name = name
 
+class DomainOverrideForbidden(StructuredException):
+    status_code = 409
+
+    def __init__(self, name=None, message="Domain override of record not allowed"):
+        StructuredException.__init__(self)
+        self.message = message
+        self.name = name
 
 class ApiKeyCreateFail(StructuredException):
     status_code = 500
@@ -60,7 +67,8 @@ class ApiKeyNotUsable(StructuredException):
     def __init__(
         self,
         name=None,
-        message="Api key must have domains or have administrative role"):
+        message=("Api key must have domains or accounts"
+                 " or an administrative role")):
         StructuredException.__init__(self)
         self.message = message
         self.name = name
@@ -120,6 +128,22 @@ class AccountDeleteFail(StructuredException):
         self.name = name
 
 
+class AccountNotExists(StructuredException):
+    status_code = 404
+
+    def __init__(self, name=None, message="Account does not exist"):
+        StructuredException.__init__(self)
+        self.message = message
+        self.name = name
+
+class InvalidAccountNameException(StructuredException):
+    status_code = 400
+
+    def __init__(self, name=None, message="The account name is invalid"):
+        StructuredException.__init__(self)
+        self.message = message
+        self.name = name
+
 class UserCreateFail(StructuredException):
     status_code = 500
 
@@ -127,7 +151,6 @@ class UserCreateFail(StructuredException):
         StructuredException.__init__(self)
         self.message = message
         self.name = name
-
 
 class UserCreateDuplicate(StructuredException):
     status_code = 409
@@ -153,11 +176,26 @@ class UserUpdateFailEmail(StructuredException):
         self.message = message
         self.name = name
 
-
 class UserDeleteFail(StructuredException):
     status_code = 500
 
     def __init__(self, name=None, message="Delete of user failed"):
+        StructuredException.__init__(self)
+        self.message = message
+        self.name = name
+
+class RecordTypeNotAllowed(StructuredException):
+    status_code = 400
+
+    def __init__(self, name=None, message="Record type not allowed or does not present"):
+        StructuredException.__init__(self)
+        self.message = message
+        self.name = name
+
+class RecordTTLNotAllowed(StructuredException):
+    status_code = 400
+
+    def __init__(self, name=None, message="Record TTL not allowed or does not present"):
         StructuredException.__init__(self)
         self.message = message
         self.name = name

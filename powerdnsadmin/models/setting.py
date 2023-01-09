@@ -26,8 +26,11 @@ class Setting(db.Model):
         'pretty_ipv6_ptr': False,
         'dnssec_admins_only': False,
         'allow_user_create_domain': False,
+        'allow_user_remove_domain': False,
         'allow_user_view_history': False,
+	    'delete_sso_accounts': False,
         'bg_domain_updates': False,
+        'enable_api_rr_history': True,
         'site_name': 'PowerDNS-Admin',
         'site_url': 'http://localhost:9191',
         'session_timeout': 10,
@@ -107,6 +110,7 @@ class Setting(db.Model):
         'oidc_oauth_email': 'email',
         'oidc_oauth_account_name_property': '',
         'oidc_oauth_account_description_property': '',
+        'enforce_api_ttl': False,
         'forward_records_allow_edit': {
             'A': True,
             'AAAA': True,
@@ -184,6 +188,12 @@ class Setting(db.Model):
             'URI': False
         },
         'ttl_options': '1 minute,5 minutes,30 minutes,60 minutes,24 hours',
+        'otp_field_enabled': True,
+        'custom_css': '',
+        'otp_force': False,
+        'max_history_records': 1000,
+        'deny_domain_override': False,
+        'account_name_extra_chars': False
     }
 
     def __init__(self, id=None, name=None, value=None):
@@ -264,11 +274,18 @@ class Setting(db.Model):
 
     def get(self, setting):
         if setting in self.defaults:
-            result = self.query.filter(Setting.name == setting).first()
+
+            if setting.upper() in current_app.config:
+                result = current_app.config[setting.upper()]
+            else:
+                result = self.query.filter(Setting.name == setting).first()
+
             if result is not None:
-                return strtobool(result.value) if result.value in [
+                if hasattr(result,'value'):
+                    result = result.value
+                return strtobool(result) if result in [
                     'True', 'False'
-                ] else result.value
+                ] else result
             else:
                 return self.defaults[setting]
         else:
