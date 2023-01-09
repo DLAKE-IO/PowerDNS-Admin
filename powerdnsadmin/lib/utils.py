@@ -4,6 +4,7 @@ import json
 import requests
 import hashlib
 import ipaddress
+import idna
 
 from collections.abc import Iterable
 from distutils.version import StrictVersion
@@ -104,6 +105,13 @@ def fetch_json(remote_url,
     data = None
     try:
         data = json.loads(r.content.decode('utf-8'))
+    except UnicodeDecodeError:
+        # If the decoding fails, switch to slower but probably working .json()
+        try:
+            logging.warning("UTF-8 content.decode failed, switching to slower .json method")
+            data = r.json()
+        except Exception as e:
+            raise e
     except Exception as e:
         raise RuntimeError(
             'Error while loading JSON data from {0}'.format(remote_url)) from e
@@ -239,12 +247,35 @@ def pretty_domain_name(value):
     """
     if isinstance(value, str):
         if value.startswith('xn--') \
-        or value.find('.xn--'):
+        or value.find('.xn--') != -1:
             try:
-                return value.encode().decode('idna')
+                return to_idna(value, 'decode')
             except:
-                raise Exception("Cannot decode IDN domain")
+                raise Exception('Cannot decode IDN domain')
         else:
             return value
     else:
-        raise Exception("Require the Punycode in string format")
+        raise Exception('Require the Punycode in string format')
+
+def to_idna(value, action):
+    splits = value.split('.')
+    result = []
+    if action == 'encode':
+        for split in splits:
+            try:
+                # Try encoding to idna
+                if not split.startswith('_') and not split.startswith('-'):
+                    result.append(idna.encode(split).decode())
+                else:
+                    result.append(split)
+            except idna.IDNAError:
+                result.append(split)
+    elif action == 'decode':
+        for split in splits:
+            if not split.startswith('_') and not split.startswith('--'):
+                result.append(idna.decode(split))   
+            else:
+                result.append(split)
+    else:
+        raise Exception('No valid action received')
+    return '.'.join(result)
