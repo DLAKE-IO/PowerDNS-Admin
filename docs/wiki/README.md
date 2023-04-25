@@ -34,13 +34,18 @@
 - [Systemd + Gunicorn + Apache](web-server/Running-PowerDNS-Admin-with-Systemd,-Gunicorn-and-Apache.md)
 - [uWSGI](web-server/uWSGI-example.md)
 - [WSGI-Apache](web-server/WSGI-Apache-example.md)
+- [Docker-ApacheReverseProxy](web-server/Running-Docker-Apache-Reverseproxy.md)
 
 ## Using PowerDNS-Admin
 
-- Setting up a domain
+- Setting up a zone
 - Adding a record
 - <whatever else>
 
 ## Feature usage
 
 - [DynDNS2](features/DynDNS2.md)
+
+## Debugging
+
+- [Debugging the build process](debug/build-process.md)

@@ -1,3 +1,4 @@
+---
 labels:
   - name: bug / broken-feature
     description: Existing feature malfunctioning or broken
@@ -20,6 +21,9 @@ labels:
   - name: feature / request
     description: New feature or enhancement request
     color: '008672'
+  - name: feature / update
+    description: Existing feature modification
+    color: '008672'
   - name: help / deployment
     description: Questions regarding application deployment
     color: 'd876e3'
@@ -34,6 +38,9 @@ labels:
     color: 'e5ef23'
   - name: mod / announcement
     description: This is an admin announcement
+    color: 'e5ef23'
+  - name: mod / change-request
+    description: Used by internal developers to indicate a change-request.
     color: 'e5ef23'
   - name: mod / changes-requested
     description: Changes have been requested before proceeding

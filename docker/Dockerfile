@@ -2,11 +2,13 @@ FROM alpine:3.17 AS builder
 
 ARG BUILD_DEPENDENCIES="build-base \
     libffi-dev \
+    libpq-dev \
     libxml2-dev \
     mariadb-connector-c-dev \
     openldap-dev \
     python3-dev \
     xmlsec-dev \
+    npm \
     yarn \
     cargo"
 
@@ -37,7 +39,7 @@ COPY . /build
 # Prepare assets
 RUN yarn install --pure-lockfile --production && \
     yarn cache clean && \
-    sed -i -r -e "s|'cssmin',\s?'cssrewrite'|'cssmin'|g" /build/powerdnsadmin/assets.py && \
+    sed -i -r -e "s|'rcssmin',\s?'cssrewrite'|'rcssmin'|g" /build/powerdnsadmin/assets.py && \
     flask assets build
 
 RUN mv /build/powerdnsadmin/static /tmp/static && \
@@ -45,6 +47,7 @@ RUN mv /build/powerdnsadmin/static /tmp/static && \
     cp -r /tmp/static/generated /build/powerdnsadmin/static && \
     cp -r /tmp/static/assets /build/powerdnsadmin/static && \
     cp -r /tmp/static/img /build/powerdnsadmin/static && \
+    find /tmp/static/node_modules -name 'webfonts' -exec cp -r {} /build/powerdnsadmin/static \; && \
     find /tmp/static/node_modules -name 'fonts' -exec cp -r {} /build/powerdnsadmin/static \; && \
     find /tmp/static/node_modules/icheck/skins/square -name '*.png' -exec cp {} /build/powerdnsadmin/static/generated \;
 
